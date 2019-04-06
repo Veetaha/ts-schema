@@ -5,9 +5,10 @@ import { stringifySchema } from './private/stringify-schema';
 /**
  * Data container for `TypeMismatch` constructor.
  */
-export type TypeMismatchData<TSchema extends Schema = Schema> = (
-    Pick<TypeMismatch<TSchema>, 'path' | 'actualValue' | 'expectedSchema'>
-);
+export type TypeMismatchData<
+    TSchema extends Schema = Schema
+> = Pick<TypeMismatch<TSchema>, 'path' | 'actualValue' | 'expectedSchema'>;
+
 
 /**
  * Represents the result of running `validate(schema, suspect, ...)` function if it
@@ -38,12 +39,12 @@ export class TypeMismatch<TSchema extends Schema = Schema> {
     /**
      * Creates an instance of `TypeMismatch`, takes on object with data properties.
      * You should never use it as it is used only internally.
-     * @param mismatchData Object which contains data describing type mismatch.
+     * @param data Object which contains data describing type mismatch.
      */
-    constructor(mismatchData: TypeMismatchData<TSchema>) { 
-        this.path           = mismatchData.path;
-        this.expectedSchema = mismatchData.expectedSchema;
-        this.actualValue    = mismatchData.actualValue;
+    constructor(data: TypeMismatchData<TSchema>) { 
+        this.path           = data.path;
+        this.expectedSchema = data.expectedSchema;
+        this.actualValue    = data.actualValue;
     }
 
     private static isJsIdentifier(suspect: string) {
@@ -58,8 +59,8 @@ export class TypeMismatch<TSchema extends Schema = Schema> {
      * 
      * @remarks
      * ```ts
-     * import * as Tss from 'ts-schema';
-     * const mismatch = Tss.validate(
+     * import * as Tsv from 'ts-schema-validator';
+     * const mismatch = Tsv.validate(
      *     { foo: { bar: { 'twenty two': [ { prop: 'string' } ] } } },
      *     { foo: { bar: { 'twenty two': [ { prop: 'str' }, { prop: -23 } ] } } }
      * );

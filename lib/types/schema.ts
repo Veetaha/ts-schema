@@ -1,4 +1,5 @@
 import * as I from 'ts-typedefs';
+import { ValidationOptions } from './validation';
 
 // Type to type schema:
 
@@ -9,15 +10,15 @@ import * as I from 'ts-typedefs';
  * 
  * @remarks
  * ```ts
- * import * as Tss from 'ts-schema';
+ * import * as Tsv from 'ts-schema-validator';
  * export interface Human {
  *     name: string;
  *     age:  number;
  * }
  * 
- * export const HumanSchema: Tss.SchemaObj<Human> = {
+ * export const HumanSchema: Tsv.SchemaObj<Human> = {
  *     name: 'string',
- *     age:  Tss.isPositiveInteger // everything is statically checked here
+ *     age:  Tsv.isPositiveInteger // everything is statically checked here
  * };
  * ```
  */
@@ -35,17 +36,20 @@ export interface SchemaArray<TTargetItems = any> extends Array<Schema<TTargetIte
  * Defines a schema set that describes a set of types target type may have.
  * @param TTarget Target type type define a set for.
  */
-export interface SchemaSet  <TTarget      = any> extends Set<Schema<TTarget>>      {}
+export interface SchemaSet<TTarget = any> extends Set<Schema<TTarget>> {}
 
 /**
  * Defines a function that given a `suspect` returns `true` if it conforms to
  * `TTarget` and `false` otherwise.
  * @param TTarget Target type this predicate describes.
+ * 
+ * @param suspect         Value that this predicate validates
+ * @param validateOptions Validate options forwarded to validating function that
+ *                        invoked this type predicate.
  */
-export type SchemaPredicate<TTarget = never> = TTarget extends never
-    ? (this: void, suspect: unknown) => boolean 
-    : (this: void, suspect: unknown) => suspect is TTarget;
-
+export type SchemaPredicate<
+    TTarget = unknown
+> = (suspect: unknown, validateOptions: ValidationOptions) => suspect is TTarget;
 
 
 /**
@@ -75,14 +79,14 @@ export type SchemaPredicate<TTarget = never> = TTarget extends never
  * 
  * Example:
  * ```ts
- * import * as Tss from 'ts-schema';
+ * import * as Tsv from 'ts-schema-validator';
  * 
- * const NameSchema = Tss.schema({
+ * const NameSchema = Tsv.schema({
  *     first: 'string',
  *     last:  'string'
  * });
  * 
- * type Name = Tss.UnpackSchema<typeof NameSchema>;
+ * type Name = Tsv.UnpackSchema<typeof NameSchema>;
  * 
  * // statically generated TypeScript type:
  * // type Name === {
@@ -90,18 +94,18 @@ export type SchemaPredicate<TTarget = never> = TTarget extends never
  * //     last:  string;
  * // }
  * 
- * const JsonUserSchema = Tss.schema({
+ * const JsonUserSchema = Tsv.schema({
  *     name:     NameSchema,
  *     password: /[a-zA-Z]{3,32}/,
  *     email:    (suspect): suspect is string => {
  *         // insert custom logic to check that suspect is an email string here
  *         return true;
  *     },
- *     cash:       Tss.isInteger,
+ *     cash:       Tsv.isInteger,
  *     isDisabled: 'boolean'
  * });
  * 
- * type JsonUser = Tss.UnpackSchema<typeof JsonUserSchema>;
+ * type JsonUser = Tsv.UnpackSchema<typeof JsonUserSchema>;
  * 
  * // statically generated TypeScript type:
  * // type JsonUser === {
@@ -117,16 +121,16 @@ export type Schema<TTarget = any> = (
     | SchemaPredicate<TTarget>
     | SchemaSet<TTarget>
     | ( 
-        TTarget extends number           ? 'number'                       : 
-        TTarget extends string           ? 'string' | RegExp              :
-        TTarget extends boolean          ? 'boolean'                      :
-        TTarget extends bigint           ? 'bigint'                       :
-        TTarget extends undefined        ? 'undefined'                    :
-        TTarget extends null             ? 'object'                       :
-        TTarget extends symbol           ? 'symbol'                       :
-        TTarget extends Function         ? 'function'                     :
-        TTarget extends (infer TItems)[] ? 'object' | SchemaArray<TItems> :
-        TTarget extends I.Obj            ? 'object' | SchemaObj<TTarget>  :
+        TTarget extends number    ? 'number'                                : 
+        TTarget extends string    ? 'string' | RegExp                       :
+        TTarget extends boolean   ? 'boolean'                               :
+        TTarget extends bigint    ? 'bigint'                                :
+        TTarget extends undefined ? 'undefined'                             :
+        TTarget extends null      ? 'object'                                :
+        TTarget extends symbol    ? 'symbol'                                :
+        TTarget extends Function  ? 'function'                              :
+        TTarget extends any[]     ? 'object' | SchemaArray<TTarget[number]> :
+        TTarget extends I.Obj     ? 'object' | SchemaObj<TTarget>           :
         never
     )
 );

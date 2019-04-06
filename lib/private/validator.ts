@@ -1,22 +1,26 @@
 import * as I from 'ts-typedefs';
-import { 
-    PathArray, TypeMismatch, Schema, ValidationOptions, isPlainObject, 
-    SchemaObj, SchemaSet
-} from '../index';
+import { ValidationOptions, PathArray, Schema, SchemaSet } from '../types';
+
+import noExcessProps from './validation-strategies/no-excess-props';
+import excessProps   from './validation-strategies/excess-props';
+import { TypeMismatch } from '../type-mismatch';
+import { isPlainObject } from '../schemas';
 
 /**
  * For internal use only.
  */
 export class Validator {
     private readonly currentPath: PathArray = [];
-    
-    constructor(options: ValidationOptions) {
-        if (options.noExcessProps) {
-            this.validateObject = this.validateObjectWithNoExcessProps;
-        }
-    }
-    
-    private makeTypeMismatch(actualValue: unknown, expectedSchema: Schema) {
+
+    constructor(
+        private readonly validationOpts: ValidationOptions
+    ) {}
+
+    private readonly objStrategy = this.validationOpts.noExcessProps 
+        ? noExcessProps 
+        : excessProps;
+
+    createTypeMismatch(actualValue: unknown, expectedSchema: Schema) {
         return new TypeMismatch({ 
             actualValue, 
             expectedSchema, 
@@ -24,11 +28,9 @@ export class Validator {
         });
     }
 
-    private validateArray(suspect:   unknown[], getSchema: (index: number) => Schema) {
+    private validateArray(suspect: unknown[], getSchemaItem: (index: number) => Schema) {
         for (let i = 0; i < suspect.length; ++i) {
-            this.currentPath.push(i);
-            const mismatch = this.validate(getSchema(i), suspect[i]);
-            this.currentPath.pop();
+            const mismatch = this.validateProperty(i, getSchemaItem(i), suspect[i]);
             if (mismatch != null) {
                 return mismatch;
             }
@@ -42,62 +44,38 @@ export class Validator {
                 return null;
             }
         }
-        return this.makeTypeMismatch(suspect, schema);
+        return this.createTypeMismatch(suspect, schema);
     }
 
-    private validateObject(suspect: I.Obj, schema: SchemaObj) {
-        for (const propName of Object.getOwnPropertyNames(schema)) {
-            this.currentPath.push(propName);
-            const mismatch = this.validate(schema[propName], suspect[propName]);
-            this.currentPath.pop();
-            if (mismatch != null) {
-                return mismatch;
-            }
-        }
-        return null;
-    }
-
-    private validateObjectWithNoExcessProps(suspect: I.Obj, schema: SchemaObj) {
-        const suspectProps = Object.getOwnPropertyNames(suspect);
-        const schemaProps  = Object.getOwnPropertyNames(schema);
-
-        // some props may be optional, that's my no === sign here
-        if (schemaProps.length < suspectProps.length) {
-            return this.makeTypeMismatch(suspect, schema);
-        }
-        
-        let excessProps = suspectProps.length;
-        for (const propName of schemaProps) {
-            this.currentPath.push(propName);
-            const mismatch = this.validate(schema[propName], suspect[propName]);
-            this.currentPath.pop();
-            if (mismatch != null) {
-                return mismatch;
-            }
-            excessProps -= Number(propName in suspect);
-        }
-        return excessProps === 0 ? null : this.makeTypeMismatch(suspect, schema);
+    validateProperty(
+        propName:        I.UnpackArray<PathArray>, 
+        ...validateArgs: Parameters<Validator['validate']>
+    ) {
+        this.currentPath.push(propName);
+        const result = this.validate(...validateArgs);
+        this.currentPath.pop();
+        return result;
     }
 
     validate(schema: Schema, suspect: unknown): null | TypeMismatch {
         if (typeof schema === 'string') {
             return typeof suspect === schema 
                 ? null 
-                : this.makeTypeMismatch(suspect, schema);
+                : this.createTypeMismatch(suspect, schema);
         }
         if (typeof schema === 'function') {
-            return schema(suspect) 
+            return schema(suspect, this.validationOpts) 
                 ? null 
-                : this.makeTypeMismatch(suspect, schema);
+                : this.createTypeMismatch(suspect, schema);
         }
         if (schema instanceof RegExp) {
             return typeof suspect === 'string' && schema.test(suspect) 
                 ? null 
-                : this.makeTypeMismatch(suspect, schema);
+                : this.createTypeMismatch(suspect, schema);
         }
         if (Array.isArray(schema)) {
             if (!Array.isArray(suspect)) {
-                return this.makeTypeMismatch(suspect, schema);
+                return this.createTypeMismatch(suspect, schema);
             }
             if (schema.length === 0) {
                 return null;
@@ -106,15 +84,16 @@ export class Validator {
                 return this.validateArray(suspect, () => schema[0]);
             }
             return schema.length !== suspect.length 
-                ? this.makeTypeMismatch(suspect, schema) 
+                ? this.createTypeMismatch(suspect, schema) 
                 : this.validateArray(suspect, i => schema[i]);
         }
         if (schema instanceof Set) {
             return this.validateSet(suspect, schema);
         }
         if (!isPlainObject(suspect) || Array.isArray(suspect)) {
-            return this.makeTypeMismatch(suspect, schema);
+            return this.createTypeMismatch(suspect, schema);
         }
-        return this.validateObject(suspect, schema);
+        return this.objStrategy.validateObject(this, suspect, schema);
     }
 }
+

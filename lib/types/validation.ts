@@ -6,7 +6,7 @@ export interface ValidationOptions {
      * Specifies whether objects with excess properties that are not specified
      * in `Schema<>` will pass the validation or not.
      */
-    noExcessProps?: boolean;
+    readonly noExcessProps?: boolean;
 }
 
 /**

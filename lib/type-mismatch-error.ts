@@ -1,4 +1,4 @@
-import { TypeMismatch, Schema, validate } from './index';
+import { TypeMismatch, Schema } from './index';
 
 /**
  * Represents an error risen by type mismatch inconsistency.
@@ -16,16 +16,5 @@ export class TypeMismatchError<TSchema extends Schema = Schema> extends Error {
     constructor(typeMismatch: TypeMismatch<TSchema>) { 
         super(typeMismatch.toErrorString());
         this.typeMismatch = typeMismatch;
-    }
-}
-
-/**
- * This function returns nothing. It throws `TypeMismatchError` if its `suspect`
- * failed to match to the given `schema` by executing `validate()`.
- */
-export function validateOrThrow(...args: Parameters<typeof validate>) {
-    const mismatch = validate(...args);
-    if (mismatch != null) {
-        throw new TypeMismatchError(mismatch);
     }
 }

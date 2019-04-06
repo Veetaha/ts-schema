@@ -1,10 +1,11 @@
 import * as Fs from 'fs';
 
-const totalCopies = 8;
+const totalCopies = 3;
 
 let code = 
 `import * as I from 'ts-typedefs';
 import { SchemaPredicate, SchemaObj, Schema, SchemaSet, SchemaArray } from "../index";
+
 
 /**
  * Defines a type that is described by the given ${'`'}TSchema${'`'} type description.
@@ -26,33 +27,27 @@ import { SchemaPredicate, SchemaObj, Schema, SchemaSet, SchemaArray } from "../i
  */
 export type UnpackSchema<TSchema extends Schema> = UnpackSchema_0<TSchema>;
 
-type UnpackSchema_${totalCopies}<TSchema extends Schema> = UnpackSchemaWithoutSet<TSchema>;
+type UnpackSchema_${totalCopies}<_TSchema extends Schema> = never;
 
-type UnpackSchemaPredicate<TSchemaPredicate extends SchemaPredicate> = (
-    I.UnpackTypePredicate<TSchemaPredicate> 
-);
+type UnpackSchemaPredicate<
+    TSchemaPredicate extends SchemaPredicate
+> = TSchemaPredicate extends (suspect: unknown, ...args: any[]) => suspect is infer TTarget ? TTarget : never;
 
-type UnpackSchemaObject<TSchemaObject extends SchemaObj> = I.MarkKeyOptionalIfUndefined<{
-    [TKey in keyof TSchemaObject]: UnpackSchema<TSchemaObject[TKey]>;
-}>;
+type UnpackTypeName<TTypeName extends I.TypeName> = {
+    string:    string;
+    number:    number;
+    boolean:   boolean;
+    bigint:    bigint;
+    undefined: undefined;
+    object:    I.Obj | null;
+    function:  I.Func<unknown[], unknown, unknown>;
+    symbol:    symbol;
+}[TTypeName];
 
-interface UnpackSchemaArray<TArrayItems extends Schema[]> 
-extends Array<UnpackSchema<TArrayItems[number]>>
-{}
-
-type UnpackSchemaWithoutSet<TSchema extends Schema> = (
+type UnpackSchemaWithoutCircularRef<TSchema extends Schema> = (
     TSchema extends RegExp          ? string                         :
-    TSchema extends 'string'        ? string                         :
-    TSchema extends 'number'        ? number                         :
-    TSchema extends 'boolean'       ? boolean                        :
-    TSchema extends 'bigint'        ? bigint                         :
-    TSchema extends 'undefined'     ? undefined                      :
-    TSchema extends 'object'        ? I.Obj | null                   :
-    TSchema extends 'function'      ? I.Func                         :
-    TSchema extends 'symbol'        ? symbol                         :    
-    TSchema extends SchemaArray     ? UnpackSchemaArray<TSchema>     :
+    TSchema extends I.TypeName      ? UnpackTypeName<TSchema>        :
     TSchema extends SchemaPredicate ? UnpackSchemaPredicate<TSchema> :
-    TSchema extends SchemaObj       ? UnpackSchemaObject<TSchema>    : 
     never
 );`;
 
@@ -60,15 +55,25 @@ for (let i = 0; i < totalCopies; ++i) {
     code += (
 `
 type UnpackSchema_${i}<TSchema extends Schema> = (    
-    TSchema extends SchemaSet      ? 
-    UnpackSchemaSet_${i}<TSchema>  :
-    UnpackSchemaWithoutSet<TSchema>
+    TSchema extends SchemaSet   ? UnpackSchemaSet_${i}<TSchema>    :
+    TSchema extends SchemaArray ? UnpackSchemaArray_${i}<TSchema>  :
+    TSchema extends SchemaObj   ? UnpackSchemaObject_${i}<TSchema> : 
+    UnpackSchemaWithoutCircularRef<TSchema>
 );
+type UnpackSchemaObject_${i}<TSchemaObject extends SchemaObj> = I.MarkKeyOptionalIfUndefined<{
+    [TKey in keyof TSchemaObject]: UnpackSchema_${i + 1}<TSchemaObject[TKey]>;
+}>;
+
 type UnpackSchemaSet_${i}<TSchemaSet extends SchemaSet> = (
     TSchemaSet extends Set<infer TItems> ? (
         TItems extends Schema ? UnpackSchema_${i + 1}<TItems> : never
     ) : never
 );
+
+interface UnpackSchemaArray_${i}<TSchemaArray extends Schema[]> 
+extends Array<UnpackSchema_${i + 1}<I.UnpackArray<TSchemaArray>>>
+{}
+
 `
     );
 }
