@@ -1,0 +1,345 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>&quot;schema&quot; | ts-schema-validator</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">ts-schema-validator</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="_schema_.html">&quot;schema&quot;</a>
+				</li>
+			</ul>
+			<h1>External module &quot;schema&quot;</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external"><a href="_schema_.html#schema" class="tsd-kind-icon">schema</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external"><a href="_schema_.html#schemaset" class="tsd-kind-icon">schema<wbr>Set</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external">
+					<a name="schema" class="tsd-anchor"></a>
+					<h3>schema</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">schema&lt;TSchema&gt;<span class="tsd-signature-symbol">(</span>schemaDefinition<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TSchema</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TSchema</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Veetaha/ts-schema-validator/blob/80090ff/lib/schema.ts#L28">schema.ts:28</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Noop function that leverages static type checking and preservation of unit types.
+										Though, you may use <code>value as const</code> cast syntax to preserve literal types,
+										using <code>schema()</code> will provide you better intellisence when defining your schemas.
+									This way you will be able to <code>UnpackSchema&lt;&gt;</code> in order to get described type.</p>
+								</div>
+								<pre><code class="language-ts"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> Tsv <span class="hljs-keyword">from</span> <span class="hljs-string">'ts-schema-validator'</span>;
+
+<span class="hljs-comment">// first option</span>
+<span class="hljs-keyword">const</span> UserSchema = Tsv.schema({
+     id: <span class="hljs-string">'number'</span>,               <span class="hljs-comment">// you see helpful completions here</span>
+     name: <span class="hljs-regexp">/[A-Za-z]{6,32}/</span>,
+     <span class="hljs-comment">//       V~~~~~~~~~~~~~~~~~~~~ argument type is deduced to be of `unknown` type</span>
+     login: (suspect): suspect is <span class="hljs-built_in">string</span> =&gt; {
+         <span class="hljs-comment">// your custom logic here</span>
+     }
+});
+<span class="hljs-comment">// Get your described type</span>
+<span class="hljs-keyword">type</span> User = Tsv.UnpackSchema&lt;<span class="hljs-keyword">typeof</span> UserSchema&gt;;</code></pre>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>TSchema<span class="tsd-signature-symbol">: </span><a href="_types_schema_.html#schema" class="tsd-signature-type">Schema</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>schemaDefinition: <span class="tsd-signature-type">TSchema</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Schema object to return.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TSchema</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external">
+					<a name="schemaset" class="tsd-anchor"></a>
+					<h3>schema<wbr>Set</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">schema<wbr>Set&lt;TSchemas&gt;<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>possibleSchemas<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TSchemas</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSchemas[number]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Veetaha/ts-schema-validator/blob/80090ff/lib/schema.ts#L63">schema.ts:63</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a set of schemas that represents a union of type shapes that the described
+										value may have. You should prefer to use this function instead of vanilla
+										new Set(possibleSchemas) as it returns the right type of schema and preserves
+									literal types.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>remarks</dt>
+									<dd><p>You may nest your sets, it won&#39;t change the result, but it is superfluous and
+											should be avoided, however <code>schemaSet(&#39;number&#39;, &#39;string&#39;)</code> will behave the
+										same way as <code>schemaSet(schemaSet(schemaSet(&#39;number&#39;), schemaSet(&#39;string&#39;)))</code>.</p>
+										<p>How you should declare type union schema:</p>
+										<pre><code class="language-ts"><span class="hljs-comment">// The wrong way:</span>
+<span class="hljs-comment">// `typeof idSchema1 === Set&lt;string | { id: string }&gt;`</span>
+<span class="hljs-keyword">const</span> idSchema1 = <span class="hljs-keyword">new</span> Set([<span class="hljs-string">'number'</span>, { id: <span class="hljs-string">'number'</span> }]);
+
+test(idSchema1, <span class="hljs-number">22</span>); <span class="hljs-comment">// compile error (schemaSet type didn't preserve literal types)</span>
+
+<span class="hljs-comment">// The right way:</span>
+<span class="hljs-comment">// `typeof idSchema2 === Set&lt;'number' | { id: 'number' }&gt;`</span>
+<span class="hljs-keyword">const</span> idSchema2 = schemaSet(<span class="hljs-string">'number'</span>, { id: <span class="hljs-string">'number'</span> });
+
+test(idSchema2, <span class="hljs-number">22</span>); <span class="hljs-comment">// compiles well</span></code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>TSchemas<span class="tsd-signature-symbol">: </span><a href="_types_schema_.html#schema" class="tsd-signature-type">Schema</a><span class="tsd-signature-symbol">[]</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>possibleSchemas: <span class="tsd-signature-type">TSchemas</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Arguments array of possible schemas for the target type.
+										The described type must match to at least one of them.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TSchemas[number]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="label tsd-is-external">
+						<span>Internals</span>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_index_.html">"index"</a>
+					</li>
+					<li class="label tsd-is-external">
+						<span>Externals</span>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_private_interfaces_object_validation_strategy_.html">"private/interfaces/object-<wbr>validation-<wbr>strategy"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_private_stringify_schema_.html">"private/stringify-<wbr>schema"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_private_validation_strategies_excess_props_.html">"private/validation-<wbr>strategies/excess-<wbr>props"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_private_validation_strategies_no_excess_props_.html">"private/validation-<wbr>strategies/no-<wbr>excess-<wbr>props"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_private_validator_.html">"private/validator"</a>
+					</li>
+					<li class="current tsd-kind-external-module tsd-is-external">
+						<a href="_schema_.html">"schema"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_schemas_index_.html">"schemas/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_schemas_number_.html">"schemas/number"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_schemas_object_.html">"schemas/object"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_schemas_optional_.html">"schemas/optional"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_test_validate_.html">"test-<wbr>validate"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_type_mismatch_.html">"type-<wbr>mismatch"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_type_mismatch_error_.html">"type-<wbr>mismatch-<wbr>error"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_types_index_.html">"types/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_types_schema_.html">"types/schema"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_types_unpack_schema_index_.html">"types/unpack-<wbr>schema/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="_types_validation_.html">"types/validation"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external">
+						<a href="_schema_.html#schema" class="tsd-kind-icon">schema</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter tsd-is-external">
+						<a href="_schema_.html#schemaset" class="tsd-kind-icon">schema<wbr>Set</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
